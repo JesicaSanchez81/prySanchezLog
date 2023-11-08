@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.OleDb;
-using System.Data;
+using System.Data;// libreria que trae los genericos de acceso a datos/
 using System.Windows.Forms;
 using System.IO;
 
@@ -14,15 +14,15 @@ namespace prySanchezLog
     {
         public string EstadoConexion;
         public string Errores;
-        public string DatosExtraidos;
+        public string DatosExtraidos; //string//
 
-        OleDbConnection conexionBD;
+        OleDbConnection conexionBD; // se crea objeto para hacer la conexion//
         public string rutaArchivo;
-        OleDbCommand comandoBD;
-        OleDbDataReader lectorBD;
+        OleDbCommand comandoBD; //  se crea objeto que indica tareas para hacer dentro de la base de datos//
+        OleDbDataReader lectorBD;// lee de inicio a fin registros de datos//
 
-        OleDbDataAdapter adaptadorDS;
-        DataSet objDataSet = new DataSet();
+        OleDbDataAdapter adaptadorDS;// carga informacion a un DataSet////ejecuta lo que esta en el comnado, ej tae una tabla//
+        DataSet objDataSet = new DataSet();// contiene varias bases de  datos o tablas de base de datos////graba, actualiza y borra// // se crea global para utilizar dentro del proyecto//
         public void ConectarBaseDatos()
         {
             try
@@ -53,29 +53,36 @@ namespace prySanchezLog
         }
         public void TraerDatos(DataGridView grilla)
         {
+            //optimiza el código//
             try
             {
+                //trae la tabla//
                 comandoBD = new OleDbCommand();
 
                 comandoBD.Connection = conexionBD;
                 comandoBD.CommandType = System.Data.CommandType.TableDirect;
-                comandoBD.CommandText = "Log";
+                comandoBD.CommandText = "Registros";
 
+                //lo carga en el lector//
                 lectorBD = comandoBD.ExecuteReader();
 
-                grilla.Columns.Add("Nombre", "Nombre");
-                grilla.Columns.Add("Apellido", "Apellido");
-                grilla.Columns.Add("Puntaje", "Puntaje");
+                //hago la grilla de forma dinámica, se  pone nombre de la grilla y el nombre del código//
+                grilla.Columns.Add("ID", "ID");
+                grilla.Columns.Add("Categoría", "Categoría");
+                grilla.Columns.Add("Fecha y Hora", "Fecha y Hora");
+                grilla.Columns.Add("Descripción", "Descripción");
 
                 while (lectorBD.Read())
                 {
-                    //DatosExtraidos += lectorBD[7] + "\n";
-                    grilla.Rows.Add(lectorBD[1], lectorBD[2], lectorBD[7]);
+                    //DatosExtraidos += (acumula)lectorBD[4] + "\n"(salto de linea);// // agrega los datos de la base de datos//
+                    grilla.Rows.Add(lectorBD[1], lectorBD[2], lectorBD[3], lectorBD[4]);
 
                 }
             }
+            // hace que no se detenga el proyecto y siga funcionando//
             catch (Exception ex)
             {
+                // si hay error, me lo muestra en error//
                 Errores = ex.Message;
             }
 
@@ -85,28 +92,35 @@ namespace prySanchezLog
         {
             try
             {
+                //conectamos a la base//
                 ConectarBaseDatos();
                 comandoBD = new OleDbCommand();
 
                 comandoBD.Connection = conexionBD;
                 comandoBD.CommandType = System.Data.CommandType.TableDirect;
-                comandoBD.CommandText = "Log";
+                comandoBD.CommandText = "Registos";
 
-                adaptadorDS = new OleDbDataAdapter(comandoBD);
-                adaptadorDS.Fill(objDataSet, "Log");
+                //crea en la memoria el adaptador//
+                adaptadorDS = new OleDbDataAdapter(comandoBD);//con lo que el comando indique//
+                //el adaptador rellena el DataSet//
+                adaptadorDS.Fill(objDataSet, "Registros");
 
-                if (objDataSet.Tables["Log"].Rows.Count > 0)
+
+                //sirve el if para preguntar si tiene datos//
+                if (objDataSet.Tables["Registros"].Rows.Count > 0)
                 {
                     grilla.Columns.Add("ID", "ID");
                     grilla.Columns.Add("Categoría", "Categoría");
-                    grilla.Columns.Add("Fecha Hora", "Fecha Hora");
+                    grilla.Columns.Add("Fecha y Hora", "Fecha y Hora");
                     grilla.Columns.Add("Descripción", "Descripción");
 
+
+                    //para cada fila de la tabla Registros hacer...//
                     foreach (DataRow fila in objDataSet.Tables[0].Rows)
                     {
-                        //DatosExtraidos += fila[1] + "\n";
+                        //DatosExtraidos += fila[1] + "\n";// //....grabar lo que está en la fila 0 de la columna0//
 
-                        grilla.Rows.Add(fila[0], fila[1], fila[2]);
+                        grilla.Rows.Add(fila[0], fila[1], fila[2], fila[3]);
                     }
                 }
 
@@ -118,8 +132,50 @@ namespace prySanchezLog
             }
 
 
+
         }
+        public void RegistrarDatosDataSet(string ID)
+        {
+            try
+            {
+                //conectamos a la base//
+                ConectarBaseDatos();
+                comandoBD = new OleDbCommand();
 
+                comandoBD.Connection = conexionBD;
+                comandoBD.CommandType = System.Data.CommandType.TableDirect;
+                comandoBD.CommandText = "Registos";
 
+                //crea en la memoria el adaptador//
+                adaptadorDS = new OleDbDataAdapter(comandoBD);//con lo que el comando indique//
+                //el adaptador rellena el DataSet//
+                adaptadorDS.Fill(objDataSet, "Registros");
+
+                //carga y graba todo lo que trae el dataset de  Registros//
+                DataTable TablaGrabar = objDataSet.Tables["Registros"];
+
+                //Crea una nueva fila con todos los campos//
+                DataRow filaGrabar = TablaGrabar.NewRow();
+
+                //graba en cada caracter como si fuera caja de texto//
+                filaGrabar[1] = ID;
+                
+
+                //en la tabla agrega el nuevo registro//
+                TablaGrabar.Rows.Add(filaGrabar);
+                
+
+                  //se crea un constructor para que pase a la base de datos//  
+                OleDbCommandBuilder constructor = new OleDbCommandBuilder(adaptadorDS);
+
+                //actualiza el DataSet con la nueva informacion//
+                adaptadorDS.Update(objDataSet);
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

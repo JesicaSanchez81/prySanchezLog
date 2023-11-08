@@ -12,15 +12,20 @@ namespace prySanchezLog
 {
     public partial class frmPrincipal : Form
     {
-        clsAccesoBD objAccesoBD = new clsAccesoBD();    
+        // se declara el objeto de forma global//
+        clsAccesoBD objAccesoBD = new clsAccesoBD();
         public frmPrincipal()
         {
             InitializeComponent();
+           
+            
         }
 
         private void btnConectar_Click(object sender, EventArgs e)
         {
+            
             objAccesoBD.ConectarBaseDatos();
+
 
             lblEstadoConexion.Text = objAccesoBD.EstadoConexion;
 
@@ -29,14 +34,32 @@ namespace prySanchezLog
 
         private void btnMostrar_Click(object sender, EventArgs e)
         {
-            objAccesoBD.TraerDatosDataSet(dgvRegistro);
+            objAccesoBD.TraerDatosDataSet(dgvRegistros);
 
-            if (txtNombre.Text != "")
+            if (txtID.Text != "")
             {
-                objAccesoBD.RegistrarDatosDataSet(txtNombre.Text);
+                objAccesoBD.RegistrarDatosDataSet(txtID.Text);
             }
         }
 
+        private void btnLeer_Click(object sender, EventArgs e)
+        {
+           // trae los datos en la grilla//
+            objAccesoBD.TraerDatos(dgvRegistros);
+        }
+
+        private void btnRegistrar_Click(object sender, EventArgs e)
+        {
+            objAccesoBD.TraerDatosDataSet(dgvRegistros);
+           
+            //si la caja de texto es distinta de ID, entonces lo ingreso//
+            if (txtID.Text != "")
+            {
+                objAccesoBD.RegistrarDatosDataSet(txtID.Text);
+            }
+
+
+        }
     }
 }
-}
+

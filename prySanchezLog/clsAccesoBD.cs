@@ -98,7 +98,7 @@ namespace prySanchezLog
 
                 comandoBD.Connection = conexionBD;
                 comandoBD.CommandType = System.Data.CommandType.TableDirect;
-                comandoBD.CommandText = "Registos";
+                comandoBD.CommandText = "Registros";
 
                 //crea en la memoria el adaptador//
                 adaptadorDS = new OleDbDataAdapter(comandoBD);//con lo que el comando indique//
@@ -144,7 +144,7 @@ namespace prySanchezLog
 
                 comandoBD.Connection = conexionBD;
                 comandoBD.CommandType = System.Data.CommandType.TableDirect;
-                comandoBD.CommandText = "Registos";
+                comandoBD.CommandText = "Registros";
 
                 //crea en la memoria el adaptador//
                 adaptadorDS = new OleDbDataAdapter(comandoBD);//con lo que el comando indique//

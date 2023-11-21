@@ -29,7 +29,7 @@ namespace prySanchezLog
             {
                 if (rutaArchivo == null)
                 {
-                    rutaArchivo = @"Provider = Microsoft.ACE.OLEDB.12.0; Data Source = ../../Base/Log.accdb";
+                    rutaArchivo = @"Provider = Microsoft.ACE.OLEDB.12.0; Data Source = ../../Base/nuevo.accdb";
                 }
                 else
                 {
@@ -169,12 +169,12 @@ namespace prySanchezLog
                 OleDbCommandBuilder constructor = new OleDbCommandBuilder(adaptadorDS);
 
                 //actualiza el DataSet con la nueva informacion//
-                adaptadorDS.Update(objDataSet);
+                adaptadorDS.Update(objDataSet, "Registros");
 
             }
             catch (Exception)
             {
-                throw;
+
             }
         }
     }
